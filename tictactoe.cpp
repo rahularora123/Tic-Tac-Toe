@@ -1,210 +1,130 @@
-#include<iostream>
-#include<ctime>
+#include <iostream>
 using namespace std;
-
-class MinMax
+class TicTacToe
 {
 public:
-    char arr[9];
-    char dup[9];
-    int VALUE;
-    int TURN;
-    int DEPTH;
-    MinMax()
-    {
-        int i;
-        for(i=1;i<=9;i++)
-        {
-            arr[i-1]=' ';
-            dup[i-1]=' ';
-        }
-    }
-    void MaxMove();
-    void MinMove();
-    void display();
-    char evaluate();
-    void randomtoss();
-    char staticevaluate(char *);
-    void process();
+TicTacToe();
+int PlayerMove(int i);
+void NextPlayer();
+void WinCheck();
+void DrawBoard();
+private:
+int board[3][3];
+int turn; // player1 == 1, player2 == 2
+int gameOver;
+void PlayGame();
 };
-void MinMax::randomtoss()  // Toss to decide which will move first
-{
-    int a,num;
-    srand(time(NULL));
-    cout << "It's the toss ! Enter 1 or 2" << endl;
-    cin >> num;
-    a=(rand()%2)+1;
-    if(num=a)
-    {
-        cout << "You won the Toss ! Make your move" << endl;
-        TURN=1;
-    }
-    else
-    {
-        cout << "You lose the toss ! I will move first :P" << endl;
-        TURN=2;
-    }
-}
-char MinMax::staticevaluate(char *a)  // The static evaluate function
-{
-    int i,VAL;
-    for(i=0;i<9;i++)
-    {
-        if(*(a+i)=='X')
-        {
-            if(i==4)
-            {
-                VAL+=10;
-            }
-            if((i==0)||(i==2)||(i==6)||(i==8))
-            {
-                VAL+=8;
-            }
-            if((i==1)||(i==3)||(i==5)||(i==7))
-            {
-                VAL+=6;
-            }
-        }
-        if(*(a+i)=='O')
-        {
-            if(i==4)
-            {
-                VAL-=10;
-            }
-            if((i==0)||(i==2)||(i==6)||(i==8))
-            {
-                VAL-=8;
-            }
-            if((i==1)||(i==3)||(i==5)||(i==7))
-            {
-                VAL-=6;
-            }
-        }
-    }
-    return VAL;
-}
-void MinMax::MaxMove()  // Player will make his move via this function
-{
-    int x;
-    cout << " Enter your move " << endl << endl;
-    cin >> x;
-    x--;
-    if(arr[x]!=' ')
-    {
-        cout << "Invalid move, Try again" << endl;
-        MaxMove();
-    }
-    else 
-       arr[x]='X';
-    TURN=2;
-}
-void MinMax::MinMove()  // The PC will make his move via this function
-{
-    int i,POS;
-    for(i=0;i<9;i++)
-    {
-        if(arr[i]==' ')
-        {
-            dup[i]='O';
-            if(staticevaluate(dup)<VALUE)
-            {
-                VALUE=staticevaluate(dup);
-                POS=i;
-            }
-            dup[i]=' ';
-        }
-    }
-    arr[POS]='O';
-    TURN=1;
-}    
-void MinMax::display()  // Displays the matrix
-{
-    int t;
-    cout << endl;
-    for(t=0;t<9;t++)
-    {
-        cout << arr[t] <<"  |" << arr[t+1] << "  |" << arr[t+2];
-        t+=2;
-        if(t!=8)
-            cout << endl << "---|---|---" << endl;
-    }
-    cout << endl;
-}
-char MinMax::evaluate()  // Checks for a win,loss or draw
-{
-    int i,c=0;
-    for(i=0; i<7; i++)   /* Check Rows */
-    {
-        if(arr[i]==arr[i+1] && arr[i+1]==arr[i+2])
-            return arr[i];
-        i+=2;
-    }
-    for(i=0; i<3; i++)  /* Check Columns */
-    {
-        if(arr[i]==arr[i+3] && arr[i+3]==arr[i+6]) 
-            return arr[i];
-    }
-    if(arr[0]==arr[4] && arr[4]==arr[8])  /* Test Diagonals */
-         return arr[0];
 
-    if(arr[2]==arr[4] && arr[4]==arr[6])  /* Test Diagonals */
-         return arr[2];
-    
-    for(i=0;i<9;i++)
-    {
-         if(arr[i]!=' ')
-             c++;
-    }
-    if(c==9)
-        return 'D';
-    return ' ';
-}
-void MinMax::process()
+TicTacToe::TicTacToe()
 {
-    char ch;
-    randomtoss();
-    do
-    {
-        if(TURN==1)
-        {
-            MaxMove();
-            TURN=2;
-        }   
-        else
-        {
-            MinMove();
-            TURN=1;
-        }    
-        display();
-        cout << endl;
-        ch=evaluate();
-        if(ch=='X')
-        {
-            display();
-            cout << endl;
-            cout <<"YOU WON !!"<< endl;
-            exit(0);
-        }
-        if(ch=='O')
-        {
-            display();
-            cout << endl;
-            cout <<"I WON !!"<< endl;
-            exit(0);
-        }
-        if(ch=='D')
-        {
-            display();
-            cout << endl;
-            cout <<"IT'S A DRAW !!"<< endl;
-            exit(0);
-        }
-    }
-    while(ch==' ');
+for(int i = 0; i < 3; i++)
+for(int j = 0; j < 3; j++)
+ board[i][j] = 0;// 0 means empty
+turn = 1; // player1
+gameOver = 0;
+DrawBoard();
+PlayGame();
 }
+
+int TicTacToe::PlayerMove(int i)
+{
+int x = (i - 1)/3;
+int y = ((i + 2) % 3);
+int returnVal = board[x][y];
+if (returnVal == 0)
+{
+board[x][y] = turn;
+WinCheck();
+if (!gameOver)
+NextPlayer();
+
+}
+else
+cout << "Invalid move, try again.\n";
+DrawBoard();
+return returnVal;
+}
+
+void TicTacToe::NextPlayer()
+{
+if (turn == 1)
+turn = 2;
+else
+turn = 1;
+}
+
+void TicTacToe::WinCheck()
+{
+if ((board[0][0] == turn) && (board[1][0] == turn) && (board[2][0] == turn))
+gameOver = turn;
+else
+if ((board[0][1] == turn) && (board[1][1] == turn) && (board[2][1] == turn))
+gameOver = turn;
+else
+if ((board[0][2] == turn) && (board[1][2] == turn) && (board[2][2] == turn))
+gameOver = turn;
+else
+if ((board[0][0] == turn) && (board[0][1] == turn) && (board[0][2] == turn))
+gameOver = turn;
+else
+if ((board[1][0] == turn) && (board[1][1] == turn) && (board[1][2] == turn))
+gameOver = turn;
+else
+if ((board[2][0] == turn) && (board[2][1] == turn) && (board[2][2] == turn))
+gameOver = turn;
+else
+if ((board[0][0] == turn) && (board[1][1] == turn) && (board[2][2] == turn))
+gameOver = turn;
+else
+if ((board[0][2] == turn) && (board[1][1] == turn) && (board[2][0] == turn))
+gameOver = turn;
+}
+/*****************************************************************************
+ * If the game has been won, set gameOver equal to turn.
+ * Turn always contains a value that is boolean true: 1 or 2.
+ *****************************************************************************/
+void TicTacToe::PlayGame()
+{
+int i;
+while (gameOver!=turn)
+{
+//DrawBoard();
+cout << "Player[" << turn << "] Please enter move: ";
+cin >> i;
+PlayerMove(i);
+}
+cout << "Player[" << turn << "] Wins!" << endl;
+}
+
+void TicTacToe::DrawBoard()
+{
+int temp[9];
+int k = 0;
+for(int i = 0; i < 3; i++)
+for(int j = 0; j < 3; j++)
+{
+if (board[i][j] == 0)
+temp[k] = k+49;
+else
+ {
+if (board[i][j] == 1)
+ temp[k] = 88;
+else
+ temp[k] = 79;
+ }
+k++;
+}
+cout << "+---+---+---+\n";
+cout <<"| " << (char)temp[0] << " | " << (char)temp[1] << " | " << (char)temp[2] << " | \n";
+cout << "+---+---+---+\n";
+cout <<"| " << (char)temp[3] << " | " << (char)temp[4] << " | " << (char)temp[5] << " | \n";
+cout << "+---+---+---+\n";
+cout <<"| " << (char)temp[6] << " | " << (char)temp[7] << " | " << (char)temp[8] << " | \n";
+cout << "+---+---+---+\n";
+}
+
 int main()
 {
-    MinMax play;
-    play.process();
-    return 0;
+TicTacToe Game;
+return 0;
 }
