@@ -79,10 +79,6 @@ else
 if ((board[0][2] == turn) && (board[1][1] == turn) && (board[2][0] == turn))
 gameOver = turn;
 }
-/*****************************************************************************
- * If the game has been won, set gameOver equal to turn.
- * Turn always contains a value that is boolean true: 1 or 2.
- *****************************************************************************/
 void TicTacToe::PlayGame()
 {
 int i;
